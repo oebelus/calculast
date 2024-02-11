@@ -82,15 +82,13 @@ class AST {
             else {
                 if (this.root == undefined) {
                     this.root = node
-                    let popped = stack.pop()
-                    if (popped) node.left = popped
+                    node.left = stack.pop()
                     current = this.root
                 }
                 else {
                     if (current) { 
                         current.right = node
-                        popped = stack.pop()
-                        node.left = popped
+                        node.left = stack.pop()
                         current = current.right
                     }
                 }
