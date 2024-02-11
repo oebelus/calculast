@@ -8,17 +8,42 @@
         - The elements inside the parenthesis are evaluated first
 */
 
-const expression: string = "7+345*4+11"
-const types: string[] = ["BinaryOperation", "NumericLiteral", "Parenthese"]
+const expression: string = "7*365+11-55"
 
-let dictionary: Record<string, RegExp> = {
-    "BinaryOperation": /[\+*-/]/,
+type BinaryOperation = `${'+' | '/' | '*' | '-'}`
+type NumericLiteral = `${number}`
+type Parenthese = `${'(' | ')'}`
+
+function Addition(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
+    return `${parseInt(x) + parseInt(y)}`;
+}
+
+function Multiplication(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
+    return `${parseInt(x) * parseInt(y)}`;
+}
+
+function Division(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
+    return `${parseInt(x) / parseInt(y)}`;
+}
+
+function Substraction(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
+    return `${parseInt(x) - parseInt(y)}`;
+}
+
+const binaryOperations: Record<BinaryOperation, (x: NumericLiteral, y:NumericLiteral) => NumericLiteral> = {
+    "+": Addition,
+    "-": Substraction,
+    "/": Division,
+    "*": Multiplication
+}
+
+let types: Record<string, RegExp> = {
+    "BinaryOperation": /[\+\*-/]/,
     "NumericLiteral":  /\d+/,
     "Parenthese": /[()]/
 }
 
-let str = "+2545++55"
-console.log(new RegExp(/^\d+/).test(str))
+let exp = expression.replaceAll(" ", "")
 
 function tokenizer(expression: string): string[] {
     let tokens: string[] = [];
@@ -34,11 +59,11 @@ function tokenizer(expression: string): string[] {
         }
         count++
     }
-    tokens.push(buffer)
+    if (buffer != "") tokens.push(buffer)
     return tokens
 }
 
-const tokens = tokenizer(expression)
+const tokens = tokenizer(exp)
 
 /* Rules:
     Interior nodes: operations
@@ -72,7 +97,6 @@ class AST {
         let length = expression.length
         let current = this.root
         let stack: aNode[] = []
-        let popped: aNode | undefined;
         
         for (let i = 0; i < length; i++) {
             let node = new aNode(expression[i])
@@ -97,16 +121,29 @@ class AST {
         if (current) current.right = stack.pop()
         return this.root? this.root : new aNode("5")
     }
+
+    dfs(node:aNode) {
+        console.log(node.value) 
+        if (node.left) this.dfs(node.left)
+        if (node.right) this.dfs(node.right)
+    }
+
+    Collapse(root: aNode): NumericLiteral {
+        let current: aNode = root
+        if (current.right && current.left) {
+            if (new RegExp(types["NumericLiteral"]).test(current.right.value)) {
+                return binaryOperations[current.value as BinaryOperation](current.left.value as NumericLiteral, current.right.value as NumericLiteral)
+                
+            }
+            else {
+                current.value = binaryOperations[current.value as BinaryOperation](current.left.value as NumericLiteral, this.Collapse(current.right) as NumericLiteral)
+            }
+        }
+        return current.value as NumericLiteral
+    }
 }
 
-
+// 2511
 let ast = new AST()
 ast.Add(tokens)
-console.log(ast)
-
-
-
-/*let pattern = /[()]/
-let digit = ')'
-let match = pattern.test(digit)
-console.log(match)*/
+if (ast.root) console.log(ast.Collapse(ast.root))
