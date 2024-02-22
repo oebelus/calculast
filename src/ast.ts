@@ -1,18 +1,16 @@
-/*
-    digits (terminal symbols): /\d+/
-    operations: /[\+*-/]/
-    parentheses: /[()]/
+let expression = "4 + 4 * 2 / ( 1 - 5 )" // -> 4 4 2 * 1 5 - / +
 
-    Rules:
-        - The "*" and "/" come before "+" and "-"
-        - The elements inside the parenthesis are evaluated first
-*/
-
-const expression: string = "7*365+11-55"
-
-type BinaryOperation = `${'+' | '/' | '*' | '-'}`
+type Operation = `${'+' | '/' | '*' | '-' | '!' | '^'}`
 type NumericLiteral = `${number}`
 type Parenthese = `${'(' | ')'}`
+
+const isBinaryOperation = (char: string): boolean => {
+    return '+-*/^!'.includes(char);
+};
+
+const isNumericalLiteral = (char: string): boolean => {
+    return !isNaN(parseInt(char))
+}
 
 function Addition(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
     return `${parseInt(x) + parseInt(y)}`;
@@ -30,120 +28,122 @@ function Substraction(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
     return `${parseInt(x) - parseInt(y)}`;
 }
 
-const binaryOperations: Record<BinaryOperation, (x: NumericLiteral, y:NumericLiteral) => NumericLiteral> = {
+function Exponentiation(x: NumericLiteral, y: NumericLiteral): NumericLiteral {
+    return `${Math.pow(parseInt(x), parseInt(y))}`
+}
+
+function Factorial(x: NumericLiteral): NumericLiteral {
+    let y = parseInt(x)
+    if (y <= 1) return '1'; 
+    return `${y * parseInt(Factorial(`${y - 1}`))}`;
+}
+
+const operations: Record<Operation, (x: NumericLiteral, y:NumericLiteral) => NumericLiteral> = {
     "+": Addition,
     "-": Substraction,
     "/": Division,
-    "*": Multiplication
+    "*": Multiplication,
+    "!": Factorial,
+    "^": Exponentiation
 }
 
-let types: Record<string, RegExp> = {
-    "BinaryOperation": /[\+\*-/]/,
-    "NumericLiteral":  /\d+/,
-    "Parenthese": /[()]/
+const precedence: Record<Operation, number> = {
+    '+': 0,
+    '-': 0,
+    '*': 1,
+    '/': 1,
+    '!': 2,
+    '^': 3
 }
 
 let exp = expression.replaceAll(" ", "")
+type Token = Operation | NumericLiteral | Parenthese | ""
 
-function tokenizer(expression: string): string[] {
-    let tokens: string[] = [];
+function tokenizer(expression: string): Token[] {
+    let tokens: Token[] = [];
     let length: number = expression.length
-    let buffer: string = ""
+    let buffer: Token = ""
     let count = 0;
     while (count < length) {
-        if (new RegExp(/^\d+/).test(expression[count])) buffer += expression[count]
+        if (typeof(expression[count]) == "number") buffer! += expression[count]
         else {
-            if (buffer != "") tokens.push(buffer)
-            tokens.push(expression[count])
+            if (buffer != "") tokens.push(buffer as Token)
+            tokens.push(expression[count] as Token)
             buffer = ""
         }
         count++
     }
-    if (buffer != "") tokens.push(buffer)
+    if (buffer != "") tokens.push(buffer as Token)
     return tokens
 }
 
 const tokens = tokenizer(exp)
+//console.log(tokens)
 
-/* Rules:
-    Interior nodes: operations
-    Leaves : operands
-
-    Expression: \d+
-*/
-
-class aNode {
-    //type: string
-    value: string
-    left: aNode | undefined
-    right: aNode | undefined
-
-    constructor(/*type: string, */value: string) {
-        //this.type = type
-        this.value = value
-        this.left = undefined
-        this.right = undefined
-    }
-}
-
-class AST {
-    root: aNode | undefined
-
-    constructor() {
-        this.root = undefined
-    }
-
-    Add(expression: string[]): aNode {
-        let length = expression.length
-        let current = this.root
-        let stack: aNode[] = []
-        
-        for (let i = 0; i < length; i++) {
-            let node = new aNode(expression[i])
-            
-            if (new RegExp(/^\d+/).test(expression[i])) stack.push(node)
-            
-            else {
-                if (this.root == undefined) {
-                    this.root = node
-                    node.left = stack.pop()
-                    current = this.root
-                }
-                else {
-                    if (current) { 
-                        current.right = node
-                        node.left = stack.pop()
-                        current = current.right
-                    }
-                }
+function sya(tokens: Token[]): string[] {
+    // 3 4 2 × 1 5 − 2 3 ^ ^ / +
+    let op_stack:string[] = []
+    let queue: string[] = []
+    while (tokens.length > 0) {
+        let head = tokens.shift()
+        if (isBinaryOperation(head!)) {
+            if (precedence[head as Operation] > precedence[op_stack[op_stack.length-1] as Operation]) {
+                op_stack.push(head!)
             }
-        }
-        if (current) current.right = stack.pop()
-        return this.root? this.root : new aNode("5")
-    }
-
-    dfs(node:aNode) {
-        console.log(node.value) 
-        if (node.left) this.dfs(node.left)
-        if (node.right) this.dfs(node.right)
-    }
-
-    Collapse(root: aNode): NumericLiteral {
-        let current: aNode = root
-        if (current.right && current.left) {
-            if (new RegExp(types["NumericLiteral"]).test(current.right.value)) {
-                return binaryOperations[current.value as BinaryOperation](current.left.value as NumericLiteral, current.right.value as NumericLiteral)
-                
+            else if (precedence[head as Operation] < precedence[op_stack[op_stack.length-1] as Operation]) {
+                queue.push(op_stack.pop()!)
+                op_stack.push(head!)
+            }
+            else if (head === '*' && op_stack[op_stack.length-1] === "/") {
+                op_stack.push(head)
+            }
+            else if (head === '/' && op_stack[op_stack.length-1] === "*") {
+                queue.push(op_stack.pop()!)
+                op_stack.push(head)
             }
             else {
-                current.value = binaryOperations[current.value as BinaryOperation](current.left.value as NumericLiteral, this.Collapse(current.right) as NumericLiteral)
+                op_stack.push(head!)
             }
         }
-        return current.value as NumericLiteral
+        else if (isNumericalLiteral(head!)) queue.push(head!)
+        else if (head == '(') op_stack.push(head)
+        else if (head == ')') {
+            while (op_stack[op_stack.length-1] != '(') {
+                queue.push(op_stack.pop()!)
+            }
+            op_stack.pop()
+        }
     }
+    while (op_stack.length > 0) {
+        queue.push(op_stack.pop()!)
+    }
+    return queue
 }
 
-// 2511
-let ast = new AST()
-ast.Add(tokens)
-if (ast.root) console.log(ast.Collapse(ast.root))
+//console.log(sya(tokens).join(""))
+
+function rpevaluator(rps: string[]): number { 
+    let stack: string[] = []
+    let popped = rps.pop()
+    stack.push(popped!)
+    for (let i = 0; i < rps.length; i++) {
+        if (isNumericalLiteral(rps[i])) {
+            stack.push(rps[i])
+        }
+        else {
+            if (isBinaryOperation(rps[i])) { 
+                let acc = operations[rps[i] as Operation](stack[stack.length-2] as NumericLiteral, stack[stack.length-1] as NumericLiteral) as string
+                stack.pop()
+                stack.pop()
+                stack.push(acc)
+                acc = ""
+            }
+            else {
+                stack.push(rps[i])
+            }
+        }
+   }
+   return parseInt(operations[stack[0] as Operation](stack[1] as NumericLiteral, stack[2] as NumericLiteral) as string)
+}
+
+console.log(rpevaluator(sya(tokens)))
