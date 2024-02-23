@@ -1,5 +1,5 @@
 import { Operation, Token } from "./types"
-import { isBinaryOperation, isNumericalLiteral, precedence } from "./utils"
+import { isBinaryOperation, isNumericalLiteral, isUnaryOperation, precedence } from "./utils"
 
 export function sya(tokens: Token[]): string[] {
     let op_stack:string[] = []
@@ -27,7 +27,7 @@ export function sya(tokens: Token[]): string[] {
                 op_stack.push(head!)
             }
         }
-        else if (isNumericalLiteral(head!)) queue.push(head!)
+        else if (isNumericalLiteral(head!) || isUnaryOperation(head!)) queue.push(head!)
         else if (head == '(') {
             op_stack.push(head)
         }

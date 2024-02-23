@@ -21,14 +21,14 @@ function main() {
     console.log("The Reverse Polish Notation of your expression: ", rpn_1.join(""))
 
     // Construct an AST and evaluate it
-    const ast = new AST();
-    ast.Add(rpn_1);
+    //const ast = new AST();
+    //ast.Add(rpn_1);
 
     // Evaluate RPN using stack calculation
     const rpnResult = rpnEvaluator(rpn_2);
 
     // Output results
-    console.log("Result from AST evaluation:", ast.Collapse(ast.root!));
+    //console.log("Result from AST evaluation:", ast.Collapse(ast.root!));
     console.log("Result from RPN evaluation using stack calculation:", rpnResult);
 }
 

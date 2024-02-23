@@ -1,46 +1,68 @@
-import { NumericLiteral, Operation } from "./types";
+import { BinaryOperation, NumericLiteral, Operation, UnaryOperation } from "./types";
 
 export const isBinaryOperation = (char: string): boolean => {
-    return '+-*/^!'.includes(char);
+    return '+-*/^'.includes(char);
+};
+
+export const isUnaryOperation = (char: string): boolean => {
+    return '!sincostan'.includes(char);
 };
 
 export const isNumericalLiteral = (char: string): boolean => {
     return !isNaN(parseInt(char))
 }
 
-function Addition(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
+export function Addition(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
     return `${parseInt(x) + parseInt(y)}`;
 }
 
-function Multiplication(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
+export function Multiplication(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
     return `${parseInt(x) * parseInt(y)}`;
 }
 
-function Division(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
+export function Division(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
     return `${parseInt(x) / parseInt(y)}`;
 }
 
-function Substraction(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
+export function Substraction(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
     return `${parseInt(x) - parseInt(y)}`;
 }
 
-function Exponentiation(x: NumericLiteral, y: NumericLiteral): NumericLiteral {
+export function Exponentiation(x: NumericLiteral, y: NumericLiteral): NumericLiteral {
     return `${Math.pow(parseInt(x), parseInt(y))}`
 }
 
-function Factorial(x: NumericLiteral): NumericLiteral {
+export function Factorial(x: NumericLiteral): NumericLiteral {
     let y = parseInt(x)
     if (y <= 1) return '1'; 
     return `${y * parseInt(Factorial(`${y - 1}`))}`;
 }
 
-export const operations: Record<Operation, (x: NumericLiteral, y:NumericLiteral) => NumericLiteral> = {
+export function Sine(x: NumericLiteral): NumericLiteral {
+    return `${Math.sin(parseInt(x))}`
+}
+
+export function Cosine(x: NumericLiteral): NumericLiteral {
+    return `${Math.cos(parseInt(x))}`
+}
+
+export function Tangent(x: NumericLiteral): NumericLiteral {
+    return `${Math.tan(parseInt(x))}`
+}
+
+export const binaryOperations: Record<BinaryOperation, (x: NumericLiteral, y:NumericLiteral) => NumericLiteral> = {
     "+": Addition,
     "-": Substraction,
     "/": Division,
     "*": Multiplication,
-    "!": Factorial,
     "^": Exponentiation
+}
+
+export const unaryOperations: Record<UnaryOperation, (x: NumericLiteral) => NumericLiteral> = {
+    "!": Factorial,
+    "sin": Sine,
+    "cos": Cosine,
+    "tan": Tangent
 }
 
 export const precedence: Record<Operation, number> = {
@@ -49,5 +71,8 @@ export const precedence: Record<Operation, number> = {
     '*': 1,
     '/': 1,
     '!': 2,
-    '^': 3
+    '^': 3,
+    'sin': 3,
+    'cos': 3,
+    'tan': 3
 }

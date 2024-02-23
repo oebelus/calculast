@@ -1,5 +1,5 @@
 import { Token } from "./types";
-import { isNumericalLiteral } from "./utils";
+import { isNumericalLiteral, isUnaryOperation } from "./utils";
 
 export function tokenizer(expression: string): Token[] {
     let tokens: Token[] = [];
@@ -8,6 +8,7 @@ export function tokenizer(expression: string): Token[] {
     let count = 0;
     while (count < length) {
         if (isNumericalLiteral(expression[count])) buffer! += expression[count]
+        else if (isUnaryOperation(expression[count]) && (isUnaryOperation(buffer[buffer.length-1]) || buffer ==="")) buffer += expression[count]
         else {
             if (buffer != "") tokens.push(buffer as Token)
             tokens.push(expression[count] as Token)

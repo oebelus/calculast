@@ -1,5 +1,5 @@
-import { NumericLiteral, Operation } from "./types"
-import { isBinaryOperation, isNumericalLiteral, operations } from "./utils"
+import { BinaryOperation, NumericLiteral, Operation } from "./types"
+import { binaryOperations, isBinaryOperation, isNumericalLiteral } from "./utils"
 
 class aNode {
     //type: string
@@ -69,16 +69,16 @@ export class AST {
     Collapse(root: aNode): NumericLiteral {
         let current: aNode = root
         if (isNumericalLiteral(current.right!.value) && isNumericalLiteral(current.left!.value)) {
-            return operations[current.value as Operation](current.left!.value as NumericLiteral, current.right!.value as NumericLiteral)
+            return binaryOperations[current.value as BinaryOperation](current.left!.value as NumericLiteral, current.right!.value as NumericLiteral)
         }
         else {
-            if (isBinaryOperation(current.left!.value) && isNumericalLiteral(current.right!.value))
-                current.value = operations[current.value as Operation](this.Collapse(current.left!) as NumericLiteral, current.right!.value as NumericLiteral)
-            else if (isBinaryOperation(current.right!.value) && isNumericalLiteral(current.left!.value))
-                current.value = operations[current.value as Operation](current.left!.value as NumericLiteral, this.Collapse(current.right!) as NumericLiteral)
-            else if (isBinaryOperation(current.left!.value) && isBinaryOperation(current.right!.value)) 
-                current.value = operations[current.value as Operation](this.Collapse(current.left!) as NumericLiteral, this.Collapse(current.right!) as NumericLiteral)
+            let current: aNode = root
+            if (isNumericalLiteral(current.value)) {
+                return current.value as NumericLiteral
+            }
+            else {
+                return binaryOperations[current.value as BinaryOperation](this.Collapse(current.left!) as NumericLiteral, this.Collapse(current.right!) as NumericLiteral)
+            }
         }
-        return current.value as NumericLiteral
     }
 }
