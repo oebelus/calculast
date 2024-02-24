@@ -1,4 +1,4 @@
-# Mathematical Expression Evaluator (A fancy way to say calculator)
+# Mathematical Expression Evaluator (A fancy way to say Calculator)
 
 This TypeScript program evaluates a mathematical expression in infix notation and returns the result. It supports binary operations (+, -, *, /, ^) for basic arithmetic calculations, and some unary operations (!, sin, cos, tan).<br><br> -> The program converts the infix expression to Reverse Polish Notation (RPN) using the Shunting Yard Algorithm and then evaluates it either by constructing an Abstract Syntax Tree (AST) and collapsing the tree or by using stack calculations.
 
