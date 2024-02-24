@@ -6,7 +6,7 @@ export function sya(tokens: Token[]): string[] {
     let queue: string[] = []
     while (tokens.length > 0) {
         let head = tokens.shift()
-        if (isBinaryOperation(head!)) {
+        if (isBinaryOperation(head!) || isUnaryOperation(head!)) {
             if (precedence[head as Operation] > precedence[op_stack[op_stack.length-1] as Operation]) {
                 op_stack.push(head!)
             }

@@ -9,45 +9,45 @@ export const isUnaryOperation = (char: string): boolean => {
 };
 
 export const isNumericalLiteral = (char: string): boolean => {
-    return !isNaN(parseInt(char))
+    return !isNaN(parseFloat(char))
 }
 
 export function Addition(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
-    return `${parseInt(x) + parseInt(y)}`;
+    return `${parseFloat(x) + parseFloat(y)}`;
 }
 
 export function Multiplication(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
-    return `${parseInt(x) * parseInt(y)}`;
+    return `${parseFloat(x) * parseFloat(y)}`;
 }
 
 export function Division(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
-    return `${parseInt(x) / parseInt(y)}`;
+    return `${parseFloat(x) / parseFloat(y)}`;
 }
 
 export function Substraction(x: NumericLiteral, y:NumericLiteral): NumericLiteral {
-    return `${parseInt(x) - parseInt(y)}`;
+    return `${parseFloat(x) - parseFloat(y)}`;
 }
 
 export function Exponentiation(x: NumericLiteral, y: NumericLiteral): NumericLiteral {
-    return `${Math.pow(parseInt(x), parseInt(y))}`
+    return `${Math.pow(parseFloat(x), parseFloat(y))}`
 }
 
 export function Factorial(x: NumericLiteral): NumericLiteral {
-    let y = parseInt(x)
+    let y = parseFloat(x)
     if (y <= 1) return '1'; 
-    return `${y * parseInt(Factorial(`${y - 1}`))}`;
+    return `${y * parseFloat(Factorial(`${y - 1}`))}`;
 }
 
 export function Sine(x: NumericLiteral): NumericLiteral {
-    return `${Math.sin(parseInt(x))}`
+    return `${Math.sin(parseFloat(x))}`
 }
 
 export function Cosine(x: NumericLiteral): NumericLiteral {
-    return `${Math.cos(parseInt(x))}`
+    return `${Math.cos(parseFloat(x))}`
 }
 
 export function Tangent(x: NumericLiteral): NumericLiteral {
-    return `${Math.tan(parseInt(x))}`
+    return `${Math.tan(parseFloat(x))}`
 }
 
 export const binaryOperations: Record<BinaryOperation, (x: NumericLiteral, y:NumericLiteral) => NumericLiteral> = {

@@ -1,5 +1,5 @@
-import { BinaryOperation, NumericLiteral, Operation } from "./types"
-import { binaryOperations, isBinaryOperation, isNumericalLiteral } from "./utils"
+import { BinaryOperation, NumericLiteral, Operation, UnaryOperation } from "./types"
+import { binaryOperations, isBinaryOperation, isNumericalLiteral, isUnaryOperation, unaryOperations } from "./utils"
 
 class aNode {
     //type: string
@@ -37,48 +37,71 @@ export class AST {
                     current = this.root
                     stack.push(current)
                 } else {
-                    if (isNumericalLiteral(current!.value)) {
+                    while (isNumericalLiteral(current!.value) || 
+                    (isUnaryOperation(current!.value) && current!.right)) {
                         current = stack.pop()
                     }
                     if (!current!.right) {
                         current!.right = node
                         current = current!.right
                     }
-                    else if (!current!.left) {
+                    else if (!current!.left && !isUnaryOperation(current!.value)) {
                         current!.left = node
                         current = current!.left
                     }
                     stack.push(current!)
                 }
-            } else {
-                if (isNumericalLiteral(current!.value)) {
+            }
+            else if (isUnaryOperation(rpn[i])) { // It should have one child only, let's say right
+                if (!this.root) {
+                    this.root = node
+                    current = this.root
+                } else {
+                    while (isNumericalLiteral(current!.value) || 
+                    (isUnaryOperation(current!.value) && current!.right)) {
+                        current = stack.pop()
+                    }
+                    if (!current!.right) {
+                        current!.right = node
+                        current = current!.right
+                    }
+                    else if (!current!.left || 
+                    (!isUnaryOperation(current!.value) && current!.right)) {
+                        current!.left = node
+                        current = current!.left
+                    }
+                }
+                stack.push(current!)
+            }
+            else if (isUnaryOperation(rpn[i])) {
+                
+            }
+            else {
+                while (isNumericalLiteral(current!.value)) {
                     current = stack.pop()
                 } 
                 if (!current!.right) {
                     current!.right = node
                     current = current!.right
                 }
-                else if (!current!.left) {
+                else if (!current!.left || 
+                (isUnaryOperation(current!.value) && current!.right)) {
                     current!.left = node
                     current = current!.left
                 }
+                stack.push(current!)
             }
         }
         return this.root!
     }
     Collapse(root: aNode): NumericLiteral {
         let current: aNode = root
-        if (isNumericalLiteral(current.right!.value) && isNumericalLiteral(current.left!.value)) {
-            return binaryOperations[current.value as BinaryOperation](current.left!.value as NumericLiteral, current.right!.value as NumericLiteral)
+        if (isNumericalLiteral(current.value)) {
+            return current.value as NumericLiteral
         }
         else {
-            let current: aNode = root
-            if (isNumericalLiteral(current.value)) {
-                return current.value as NumericLiteral
-            }
-            else {
-                return binaryOperations[current.value as BinaryOperation](this.Collapse(current.left!) as NumericLiteral, this.Collapse(current.right!) as NumericLiteral)
-            }
+            return isBinaryOperation(current.value) ? binaryOperations[current.value as BinaryOperation](this.Collapse(current.left!) as NumericLiteral, this.Collapse(current.right!) as NumericLiteral) 
+            : unaryOperations[current.value as UnaryOperation](this.Collapse(current.right!))
         }
     }
 }
