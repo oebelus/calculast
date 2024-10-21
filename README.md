@@ -40,4 +40,4 @@ Result from RPN evaluation using stack calculation: -11694444.508011641
 
 ### Tests
 
-There are tests for the (AST)[./src/Tests/Ast.test.ts] calculations, the (RPN evaluation)[./src/Tests/RpnEvaluation.test.ts] and the (Shunting Yard Algorithm)[./src/Tests/ShuntingYard.test.ts].
+There are tests for the [AST](./src/Tests/Ast.test.ts) calculations, the [RPN evaluation](./src/Tests/RpnEvaluation.test.ts) and the [Shunting Yard Algorithm](./src/Tests/ShuntingYard.test.ts).
