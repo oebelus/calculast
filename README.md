@@ -4,9 +4,9 @@ This TypeScript program evaluates a mathematical expression in infix notation an
 
 ## Functions
 
-### [Tokenizer](./src/Tokeniser.ts)
+### [Tokenizer](./src/tokeniser.ts)
 
-The tokenizer function parses the input expression into individual tokens, such as operators, numeric literals, and Parenthesiss.
+The tokenizer function parses the input expression into individual tokens, such as operators, numeric literals, and Parenthesis.
 
 ### [Shunting Yard Algorithm](./src/ShuntingYard.ts)
 
@@ -14,10 +14,10 @@ The sya function converts the infix expression into Reverse Polish Notation (RPN
 
 ### RPN Evaluation with AST
 
-1. [AST](./src/AST.ts)
+1. [AST](./src/ast.ts)
    This function evaluates the RPN expression by constructing an Abstract Syntax Tree (AST) and collapsing the tree to compute the final result.
 
-2. [Stack Calculation](./src/RPNEvaluator)
+2. [Stack Calculation](./src/rpnEvaluator.ts)
    This function evaluates the RPN expression using stack based calculations.
 
 ## How is it used?
