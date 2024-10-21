@@ -1,7 +1,12 @@
-export type BinaryOperation = `${'+' | '/' | '*' | '-' | '^'}`
+export type Binary = `${'+' | '/' | '*' | '-' | '^'}`
 export type UnaryOperation = `${'!' | 'sin' | 'cos' | 'tan'}`
 export type NumericLiteral = `${number}`
-export type Parenthese = `${'(' | ')'}`
+export type Parenthesis = `${'(' | ')'}`
 
-export type Operation = BinaryOperation | UnaryOperation
-export type Token = BinaryOperation | UnaryOperation | NumericLiteral | Parenthese | ""
+export type Operation = Binary | UnaryOperation
+export enum TokenType { Binary, Unary, Minus, LeftParenthesis, RightParenthesis, Number };
+
+export type Token = {
+    type: TokenType
+    value: string
+}

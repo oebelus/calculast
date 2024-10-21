@@ -1,29 +1,52 @@
-import { BinaryOperation, NumericLiteral, UnaryOperation } from "./types"
-import { binaryOperations, isBinaryOperation, isNumericalLiteral, isUnaryOperation, unaryOperations } from "./utils"
+import {
+  Binary,
+  NumericLiteral,
+  Operation,
+  Token,
+  TokenType,
+  UnaryOperation,
+} from "./Types";
+import {
+  binaryOperations,
+  isBinaryOperation,
+  isNumericalLiteral,
+  isUnaryOperation,
+  unaryOperations,
+} from "./Utils";
 
 // Reverse Polish Notation Evaluator
-export function rpnEvaluator(rps: string[]): number { 
-    let stack: string[] = []
-    let shifted = rps.shift()
-    stack.push(shifted!)
-    for (let i = 0; i < rps.length + 1; i++) {
-        if (isNumericalLiteral(rps[i])) {
-            stack.push(rps[i])
-        }
-        else {
-            if (isBinaryOperation(rps[i]) && rps[i] !== '!') { 
-                    let acc = binaryOperations[rps[i] as BinaryOperation](stack[stack.length-2] as NumericLiteral, stack[stack.length-1] as NumericLiteral) as string
-                    stack.pop()
-                    stack.pop()
-                    stack.push(acc)
-                    acc = ""
-            } else if (isUnaryOperation(rps[i])) {
-                let acc = unaryOperations[rps[i] as UnaryOperation](stack[stack.length-1] as NumericLiteral)
-                stack.pop()
-                stack.push(acc)
-                acc = "" as NumericLiteral
-            }
-        }
-   }
-   return stack.length === 1 ? parseFloat(stack[0]) : parseFloat(unaryOperations[stack[0] as UnaryOperation](stack[1] as NumericLiteral))
+export function rpnEvaluator(rps: Token[]): number {
+  if (rps.length === 0) return 0;
+
+  let stack: string[] = [];
+
+  let acc = "";
+
+  for (let i = 0; i < rps.length; i++) {
+    const token = rps[i];
+
+    if (token.type === TokenType.Number) {
+      stack.push(token.value);
+    } else {
+      if (isBinaryOperation(token)) {
+        let right = stack.pop() as NumericLiteral;
+        let left = stack.pop() as NumericLiteral;
+        let operation = token.value as Binary;
+
+        acc = binaryOperations[operation](left, right);
+
+        stack.push(acc);
+      } else if (isUnaryOperation(token)) {
+        let operand = stack.pop() as NumericLiteral;
+        let operation = token.value as UnaryOperation;
+
+        let acc = unaryOperations[operation](operand);
+
+        stack.push(acc);
+      }
+      acc = "";
+    }
+  }
+
+  return parseFloat(stack[0]);
 }

@@ -1,107 +1,107 @@
-import { BinaryOperation, NumericLiteral, Operation, UnaryOperation } from "./types"
-import { binaryOperations, isBinaryOperation, isNumericalLiteral, isUnaryOperation, unaryOperations } from "./utils"
+import {
+  Binary,
+  NumericLiteral,
+  Operation,
+  Token,
+  TokenType,
+  UnaryOperation,
+} from "./Types";
+import {
+  binaryOperations,
+  isBinaryOperation,
+  isNumericalLiteral,
+  isUnaryOperation,
+  unaryOperations,
+} from "./Utils";
 
 class aNode {
-    //type: string
-    value: string
-    left: aNode | undefined
-    right: aNode | undefined
+  type: TokenType;
+  value: string;
+  left: aNode | undefined;
+  right: aNode | undefined;
 
-    constructor(/*type: string, */value: string) {
-        //this.type = type
-        this.value = value
-        this.left = undefined
-        this.right = undefined
-    }
+  constructor(type: TokenType, value: string) {
+    this.type = type;
+    this.value = value;
+    this.left = undefined;
+    this.right = undefined;
+  }
 }
 
 export class AST {
-    root: aNode | undefined
+  root: aNode | undefined;
 
-    constructor() {
-        this.root = undefined
+  constructor() {
+    this.root = undefined;
+  }
+
+  Add(rpn: Token[]): aNode {
+    let length = rpn.length;
+    let stack: aNode[] = [];
+
+    for (let i = 0; i < length; i++) {
+      let token = rpn[i];
+      let node = new aNode(token.type, token.value);
+
+      if (isUnaryOperation(token)) {
+        let rightNode = stack.pop();
+
+        if (!rightNode) {
+          throw new Error(
+            `Unary operation "${token.value}" requires one operand.`
+          );
+        }
+
+        node.right = rightNode;
+        stack.push(node);
+      } else if (isBinaryOperation(token)) {
+        let rightNode = stack.pop();
+        let leftNode = stack.pop();
+
+        if (!rightNode || !leftNode) {
+          throw new Error(
+            `Binary operation "${token.value}" requires two operands.`
+          );
+        }
+
+        node.right = rightNode;
+        node.left = leftNode;
+        stack.push(node);
+      } else if (isNumericalLiteral(token)) {
+        stack.push(node);
+      } else {
+        throw new Error(`Unknown operation: ${token.value}`);
+      }
     }
 
-    Add(rpn: string[]): aNode {
-        rpn = rpn.reverse()
-        let length = rpn.length
-        let current = this.root
-        let stack: aNode[] = []
-        
-        for (let i = 0; i < length; i++) {
-            let node = new aNode(rpn[i])
+    this.root = stack[0];
+    return this.root;
+  }
+  Collapse(root: aNode): NumericLiteral {
+    let current: aNode = root;
 
-            if (isBinaryOperation(rpn[i])) {
-                if (!this.root) {
-                    this.root = node
-                    current = this.root
-                    stack.push(current)
-                } else {
-                    while (isNumericalLiteral(current!.value) || 
-                    (isUnaryOperation(current!.value) && current!.right)) {
-                        current = stack.pop()
-                    }
-                    if (!current!.right) {
-                        current!.right = node
-                        current = current!.right
-                    }
-                    else if (!current!.left && !isUnaryOperation(current!.value)) {
-                        current!.left = node
-                        current = current!.left
-                    }
-                    stack.push(current!)
-                }
-            }
-            else if (isUnaryOperation(rpn[i])) { // It should have one child only, let's say right
-                if (!this.root) {
-                    this.root = node
-                    current = this.root
-                } else {
-                    while (isNumericalLiteral(current!.value) || 
-                    (isUnaryOperation(current!.value) && current!.right)) {
-                        current = stack.pop()
-                    }
-                    if (!current!.right) {
-                        current!.right = node
-                        current = current!.right
-                    }
-                    else if (!current!.left || 
-                    (!isUnaryOperation(current!.value) && current!.right)) {
-                        current!.left = node
-                        current = current!.left
-                    }
-                }
-                stack.push(current!)
-            }
-            else if (isUnaryOperation(rpn[i])) {
-                
-            }
-            else {
-                while (isNumericalLiteral(current!.value)) {
-                    current = stack.pop()
-                } 
-                if (!current!.right) {
-                    current!.right = node
-                    current = current!.right
-                }
-                else if (!current!.left || 
-                (isUnaryOperation(current!.value) && current!.right)) {
-                    current!.left = node
-                    current = current!.left
-                }
-                stack.push(current!)
-            }
-        }
-        return this.root!
+    if (isNumericalLiteral(current)) {
+      return current.value as NumericLiteral;
+    } else if (isBinaryOperation(current)) {
+      if (!current.left || !current.right) {
+        throw new Error(
+          `Binary operation "${current.value}" is missing operands`
+        );
+      }
+      return binaryOperations[current.value as Binary](
+        this.Collapse(current.left!) as NumericLiteral,
+        this.Collapse(current.right!) as NumericLiteral
+      );
+    } else if (isUnaryOperation(current)) {
+      if (!current.right) {
+        throw new Error(
+          `Unary operation "${current.value}" is missing operand`
+        );
+      }
+      return unaryOperations[current.value as UnaryOperation](
+        this.Collapse(current.right)
+      );
     }
-    Collapse(root: aNode): NumericLiteral {
-        let current: aNode = root
-        if (isNumericalLiteral(current.value)) {
-            return current.value as NumericLiteral
-        }
-        else {
-            return isBinaryOperation(current.value) ? binaryOperations[current.value as BinaryOperation](this.Collapse(current.left!) as NumericLiteral, this.Collapse(current.right!) as NumericLiteral) 
-            : unaryOperations[current.value as UnaryOperation](this.Collapse(current.right!))
-        }
-    }
+    throw new Error(`Unknown operation: ${current.value}`);
+  }
 }
