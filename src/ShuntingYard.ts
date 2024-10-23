@@ -41,11 +41,13 @@ export function ShuntingYard(tokens: Token[]): Token[] {
       }
       operatorStack.push(head);
     } else if (head.type == TokenType.Minus) {
-      if (operatorStack.length == 0 || (prevToken && minusIsUnary(prevToken))) {
+      if (prevToken == null || minusIsUnary(prevToken)) {
         head.type = TokenType.Unary;
+        //console.log(head, prevToken, minusIsUnary(prevToken!));
         operatorStack.push(head);
       } else {
         head.type = TokenType.Binary;
+        //console.log(head, prevToken, minusIsUnary(prevToken!));
 
         while (
           operatorStack.length > 0 &&
@@ -81,7 +83,7 @@ export function ShuntingYard(tokens: Token[]): Token[] {
   while (operatorStack.length > 0) {
     const top = operatorStack[operatorStack.length - 1];
     if (top.type == TokenType.LeftParenthesis) {
-      throw new Error("Mismatched Parenthesiss.");
+      throw new Error("Mismatched Parenthesis.");
     }
     outputQueue.push(operatorStack.pop()!);
   }

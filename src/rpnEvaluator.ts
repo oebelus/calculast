@@ -15,8 +15,8 @@ import {
 } from "./Utils";
 
 // Reverse Polish Notation Evaluator
-export function rpnEvaluator(rps: Token[]): number {
-  if (rps.length === 0) return 0;
+export function rpnEvaluator(rps: Token[]): NumericLiteral {
+  if (rps.length === 0) return "0";
 
   let stack: string[] = [];
 
@@ -48,5 +48,9 @@ export function rpnEvaluator(rps: Token[]): number {
     }
   }
 
-  return parseFloat(stack[0]);
+  return stack.length === 1
+    ? (stack[0] as NumericLiteral)
+    : (unaryOperations[rps[rps.length - 1].value as UnaryOperation](
+        stack[1] as NumericLiteral
+      ) as NumericLiteral);
 }
