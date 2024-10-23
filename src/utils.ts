@@ -30,7 +30,7 @@ export const isAlpha = (char: string): boolean => {
 };
 
 export const isRightAssociative = (token: Token): boolean => {
-  return token.value == "^";
+  return token.value == "**";
 };
 
 export const isFunction = (s: string): boolean => {
@@ -100,7 +100,7 @@ export const binaryOperations: Record<
   "-": Substraction,
   "/": Division,
   "*": Multiplication,
-  "^": Exponentiation,
+  "**": Exponentiation,
 };
 
 export const unaryOperations = {
@@ -118,7 +118,7 @@ export const precedence: Record<Operation, number> = {
   "*": 1,
   "/": 1,
   "!": 2,
-  "^": 3,
+  "**": 3,
   sin: 4,
   cos: 4,
   tan: 4,

@@ -53,7 +53,7 @@ describe("Calculator Tokenizer", () => {
       { type: TokenType.LeftParenthesis, value: "(" },
       { type: TokenType.Number, value: "5" },
       { type: TokenType.RightParenthesis, value: ")" },
-      { type: TokenType.Binary, value: "^" },
+      { type: TokenType.Binary, value: "**" },
       { type: TokenType.Number, value: "10" },
     ]);
   });
@@ -160,8 +160,8 @@ describe("Shunting Yard Algorithm", () => {
       { type: TokenType.Number, value: "2" },
       { type: TokenType.Number, value: "3" },
       { type: TokenType.Number, value: "2" },
-      { type: TokenType.Binary, value: "^" },
-      { type: TokenType.Binary, value: "^" },
+      { type: TokenType.Binary, value: "**" },
+      { type: TokenType.Binary, value: "**" },
     ]);
   });
 
@@ -179,7 +179,7 @@ describe("Shunting Yard Algorithm", () => {
       { type: TokenType.Number, value: "5" },
       { type: TokenType.Unary, value: "tan" },
       { type: TokenType.Number, value: "10" },
-      { type: TokenType.Binary, value: "^" },
+      { type: TokenType.Binary, value: "**" },
       { type: TokenType.Binary, value: "*" },
       { type: TokenType.Binary, value: "-" },
     ]);

@@ -88,8 +88,8 @@ describe("rpnEvaluator", () => {
       { type: TokenType.Number, value: "2" },
       { type: TokenType.Number, value: "3" },
       { type: TokenType.Number, value: "4" },
-      { type: TokenType.Binary, value: "^" },
-      { type: TokenType.Binary, value: "^" },
+      { type: TokenType.Binary, value: "**" },
+      { type: TokenType.Binary, value: "**" },
     ];
 
     const result = rpnEvaluator(tokens);

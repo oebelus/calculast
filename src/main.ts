@@ -39,6 +39,7 @@ function computeInput(expression: string) {
 
 function main() {
   if (process.argv.length > 2) {
+    console.log("Computing expression: ", process.argv[2]);
     computeInput(process.argv[2]);
   } else {
     const expression = getUserInput();

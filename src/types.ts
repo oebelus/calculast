@@ -1,4 +1,4 @@
-export type Binary = `${"+" | "/" | "*" | "-" | "^"}`;
+export type Binary = `${"+" | "/" | "*" | "-" | "**"}`;
 export type UnaryOperation = `${"!" | "sin" | "cos" | "tan"}`;
 export type NumericLiteral = `${number}`;
 export type Parenthesis = `${"(" | ")"}`;
