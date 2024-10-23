@@ -29,6 +29,12 @@ Enter a mathematical expression:
 >> 4+5-3!*10*tan(5)^10
 ```
 
+Or you can run it like this:
+
+```
+npm start "4+5-3!*10*tan(5)^10"
+```
+
 It then outputs its Reverse Polish Notation and evaluates it with both AST
 and Stack Based calculations:
 
