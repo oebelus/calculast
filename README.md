@@ -35,7 +35,7 @@ Or you can run it directly from the command line like this:
 npm start "4+5-3!*10*tan(5)**10"
 ```
 
-> Node: When running `npm start "<expression>"` on windows, make sure to use \*\* for exponentiation instead of ^. This is because ^ acts as an escape character rather than an exponentiation operator.
+> Note: When running `npm start "<expression>"` on windows, make sure to use \*\* for exponentiation instead of ^. This is because ^ acts as an escape character rather than an exponentiation operator.
 
 It then outputs its Reverse Polish Notation and evaluates it with both AST
 and Stack Based calculations:
